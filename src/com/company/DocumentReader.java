@@ -1,13 +1,10 @@
 package com.company;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class DocumentReader {
 
-    public String read(String filename) {
+    synchronized public String read(String filename) throws FileNotFoundException {
 
         try (FileInputStream fis = new FileInputStream(filename);
              BufferedInputStream bis = new BufferedInputStream(fis)) {
@@ -20,6 +17,8 @@ public class DocumentReader {
                 }
                 return result.toString("UTF-8");
             }
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

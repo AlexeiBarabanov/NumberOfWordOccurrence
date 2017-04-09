@@ -12,20 +12,12 @@ public class WordFrequency {
 //        this.documentIDs = new HashSet<>();
     }
 
-    public String getWord() {
-        return word;
-    }
-
-    public int getFrequency() {
-        return frequency;
-    }
-
     public synchronized void increaseFrequency() {
         this.frequency++;
     }
 
     @Override
     public String toString() {
-        return frequency + ":" + word;
+        return " [" + frequency + ":" + word + "] ";
     }
 }

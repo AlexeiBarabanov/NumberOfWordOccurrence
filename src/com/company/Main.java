@@ -1,25 +1,19 @@
 package com.company;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class Main {
 
     public static void main(String[] args) {
 
-        DocumentReader[] documents = new DocumentReader[args.length];
-        for (int i = 0; i < args.length; i++) {
-            documents[i] = new DocumentReader();
-            WordProcessor wp = new WordProcessor(documents[i].read(args[i]));
-            wp.process();
-            wp.printResult();
+        Set<String> files = new HashSet<>(Arrays.asList(args));
+
+        for (String filename : files) {
+            Thread th = new Thread(new DocumentThread(filename));
+            System.out.println("Starting " + th.getName());
+            th.start();
         }
-
-
-//
-//        Thread t1 = new Thread(new Test());
-//        Thread t2 = new Thread(new Test());
-//        Thread t3 = new Thread(new Test());
-//        t1.start();
-//        t2.start();
-//        t3.start();
-
     }
 }
