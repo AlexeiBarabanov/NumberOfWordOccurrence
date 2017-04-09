@@ -23,6 +23,6 @@ public class DocumentReader {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        return null;
+        return "";
     }
 }
