@@ -31,7 +31,7 @@ public class DocumentParser {
         int newWordsCount = 0;
         int distinctWordsCount = 0;
 
-        String words = this.text.replaceAll("[^A-Za-z0-9А-Яа-я ]", " ");
+        String words = this.text.replaceAll("[^А-Яа-я ]", " ");
         ArrayList<String> list = new ArrayList<>(Arrays.asList(words.split("\\s+")));
 
         for (String word : list) {
