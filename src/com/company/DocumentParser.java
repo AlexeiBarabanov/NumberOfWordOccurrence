@@ -2,8 +2,8 @@ package com.company;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DocumentParser {
 
@@ -11,7 +11,7 @@ public class DocumentParser {
     static final private Map<String, WordFrequency> wordFrequencies;
 
     static {
-        wordFrequencies = new ConcurrentHashMap<>();
+        wordFrequencies = new HashMap<>();
     }
 
     public DocumentParser(String text) {
@@ -36,16 +36,16 @@ public class DocumentParser {
 
         for (String word : list) {
             if (word != null && !word.isEmpty()) {
-                WordFrequency frequency = wordFrequencies.get(word);
+                WordFrequency frequency = getWord(word);
                 if (frequency == null) {
                     distinctWordsCount++;
                     frequency = new WordFrequency(word);
                     putWord(word, frequency);
-                    newWordFound(frequency);
+//                    newWordFound(frequency);
                 } else {
                     newWordsCount++;
                     frequency.increaseFrequency();
-                    wordOccurrenceFound(frequency);
+//                    wordOccurrenceFound(frequency);
                 }
             }
         }
@@ -54,8 +54,17 @@ public class DocumentParser {
                 + " out of a total of " + (newWordsCount + distinctWordsCount));
     }
 
+    private WordFrequency getWord(String word) {
+        synchronized (wordFrequencies) {
+            WordFrequency frequency = wordFrequencies.get(word);
+            return frequency;
+        }
+    }
+
     private void putWord(String word, WordFrequency frequency) {
-        wordFrequencies.put(word, frequency);
+        synchronized (wordFrequencies) {
+            wordFrequencies.put(word, frequency);
+        }
     }
 
     public void wordOccurrenceFound(WordFrequency frequency) {
