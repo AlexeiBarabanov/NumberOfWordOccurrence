@@ -19,8 +19,13 @@ public class DocumentThread implements Runnable {
             e.printStackTrace();
         }
         DocumentParser parser = new DocumentParser(text);
-        parser.start();
-        System.out.println(parser + System.lineSeparator());
+        try {
+            parser.start();
+            System.out.println(parser + System.lineSeparator());
+        } catch (DocumentParser.UnacceptableSymbolFound e) {
+            e.printStackTrace();
+        } finally {
+        }
 
     }
 }

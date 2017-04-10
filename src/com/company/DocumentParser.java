@@ -4,14 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class DocumentParser {
 
     private final String text;
     static final private Map<String, WordFrequency> wordFrequencies;
+    static volatile boolean unacceptableSymbolFound;
 
     static {
         wordFrequencies = new HashMap<>();
+        unacceptableSymbolFound = false;
     }
 
     public DocumentParser(String text) {
@@ -27,14 +30,28 @@ public class DocumentParser {
         return "Total distinct words: " + wordFrequencies.size();
     }
 
-    public void start() {
+    public void start() throws UnacceptableSymbolFound {
+        if(unacceptableSymbolFound)
+            throw new UnacceptableSymbolFound();
+
         int newWordsCount = 0;
         int distinctWordsCount = 0;
+
+        String check = this.text.replaceAll("[A-Za-z]", "");
+        if(check.length() != this.text.length()) {
+//        if(Pattern.matches(".*([a-zA-Z])+.*", text)) {
+                this.unacceptableSymbolFound = true;
+                throw new UnacceptableSymbolFound();
+        }
+
 
         String words = this.text.replaceAll("[^А-Яа-я ]", " ");
         ArrayList<String> list = new ArrayList<>(Arrays.asList(words.split("\\s+")));
 
         for (String word : list) {
+            if(unacceptableSymbolFound)
+                throw new UnacceptableSymbolFound();
+
             if (word != null && !word.isEmpty()) {
                 WordFrequency frequency = getWord(word);
                 if (frequency == null) {
@@ -73,5 +90,12 @@ public class DocumentParser {
 
     public void newWordFound(WordFrequency frequency) {
         System.out.println(Thread.currentThread().getName() + "       new word found" + frequency);
+    }
+
+    class UnacceptableSymbolFound extends Throwable {
+        @Override
+        public void printStackTrace() {
+            System.out.println(Thread.currentThread().getName() + ": Unnacceptable symbol found. Terminating the execution");
+        }
     }
 }
