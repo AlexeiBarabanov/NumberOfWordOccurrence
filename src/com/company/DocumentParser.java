@@ -31,25 +31,25 @@ public class DocumentParser {
     }
 
     public void start() throws UnacceptableSymbolFound {
-        if(unacceptableSymbolFound)
+        if (unacceptableSymbolFound)
             throw new UnacceptableSymbolFound();
 
         int newWordsCount = 0;
         int distinctWordsCount = 0;
 
         String check = this.text.replaceAll("[A-Za-z]", "");
-        if(check.length() != this.text.length()) {
+        if (check.length() != this.text.length()) {
 //        if(Pattern.matches(".*([a-zA-Z])+.*", text)) {
-                this.unacceptableSymbolFound = true;
-                throw new UnacceptableSymbolFound();
+            this.unacceptableSymbolFound = true;
+            System.out.println(Thread.currentThread().getName() + ": latin symbol occurred");
+            throw new UnacceptableSymbolFound();
         }
-
 
         String words = this.text.replaceAll("[^А-Яа-я ]", " ");
         ArrayList<String> list = new ArrayList<>(Arrays.asList(words.split("\\s+")));
 
         for (String word : list) {
-            if(unacceptableSymbolFound)
+            if (unacceptableSymbolFound)
                 throw new UnacceptableSymbolFound();
 
             if (word != null && !word.isEmpty()) {
@@ -58,11 +58,11 @@ public class DocumentParser {
                     distinctWordsCount++;
                     frequency = new WordFrequency(word);
                     putWord(word, frequency);
-//                    newWordFound(frequency);
+                    newWordFound(frequency);
                 } else {
                     newWordsCount++;
                     frequency.increaseFrequency();
-//                    wordOccurrenceFound(frequency);
+                    wordOccurrenceFound(frequency);
                 }
             }
         }
@@ -93,9 +93,8 @@ public class DocumentParser {
     }
 
     class UnacceptableSymbolFound extends Throwable {
-        @Override
-        public void printStackTrace() {
-            System.out.println(Thread.currentThread().getName() + ": Unnacceptable symbol found. Terminating the execution");
+        public UnacceptableSymbolFound() {
+            super(Thread.currentThread().getName() + " stopped it's work, due to the occurrence of a latin symbol in one of the threads ");
         }
     }
 }
