@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 public class DocumentParser {
 
+    private final String filename;
     private final String text;
     static final private Map<String, WordFrequency> wordFrequencies;
     static volatile boolean unacceptableSymbolFound;
@@ -17,8 +18,9 @@ public class DocumentParser {
         unacceptableSymbolFound = false;
     }
 
-    public DocumentParser(String text) {
+    public DocumentParser(String text, String filename) {
         this.text = text;
+        this.filename = filename;
     }
 
     static public void printWordOccurences() {
@@ -37,12 +39,12 @@ public class DocumentParser {
         int newWordsCount = 0;
         int distinctWordsCount = 0;
 
-        String check = this.text.replaceAll("[A-Za-z]", "");
-        if (check.length() != this.text.length()) {
-//        if(Pattern.matches(".*([a-zA-Z])+.*", text)) {
+        String check = this.text.replaceAll("[A-Za-z]", " ");
+//        if (!Pattern.matches("[0-9а-яА-ЯёЁ :;!?.,\"'()//\\r\\n]+", text)) {
+        if(check.length() != this.text.length()) {
             this.unacceptableSymbolFound = true;
             System.out.println(Thread.currentThread().getName() + ": latin symbol occurred");
-            throw new UnacceptableSymbolFound();
+            throw new UnacceptableSymbolFound(filename);
         }
 
         String words = this.text.replaceAll("[^А-Яа-я ]", " ");
@@ -53,16 +55,18 @@ public class DocumentParser {
                 throw new UnacceptableSymbolFound();
 
             if (word != null && !word.isEmpty()) {
-                WordFrequency frequency = getWord(word);
-                if (frequency == null) {
-                    distinctWordsCount++;
-                    frequency = new WordFrequency(word);
-                    putWord(word, frequency);
-                    newWordFound(frequency);
-                } else {
-                    newWordsCount++;
-                    frequency.increaseFrequency();
-                    wordOccurrenceFound(frequency);
+                synchronized (wordFrequencies) {
+                    WordFrequency frequency = getWord(word);
+                    if (frequency == null) {
+                        distinctWordsCount++;
+                        frequency = new WordFrequency(word);
+                        putWord(word, frequency);
+                        newWordFound(frequency);
+                    } else {
+                        newWordsCount++;
+                        frequency.increaseFrequency();
+                        wordOccurrenceFound(frequency);
+                    }
                 }
             }
         }
@@ -71,17 +75,13 @@ public class DocumentParser {
                 + " out of a total of " + (newWordsCount + distinctWordsCount));
     }
 
-    private WordFrequency getWord(String word) {
-        synchronized (wordFrequencies) {
-            WordFrequency frequency = wordFrequencies.get(word);
-            return frequency;
-        }
+    public WordFrequency getWord(String word) {
+        WordFrequency frequency = wordFrequencies.get(word);
+        return frequency;
     }
 
-    private void putWord(String word, WordFrequency frequency) {
-        synchronized (wordFrequencies) {
-            wordFrequencies.put(word, frequency);
-        }
+    public void putWord(String word, WordFrequency frequency) {
+        wordFrequencies.put(word, frequency);
     }
 
     public void wordOccurrenceFound(WordFrequency frequency) {
@@ -92,9 +92,21 @@ public class DocumentParser {
         System.out.println(Thread.currentThread().getName() + "       new word found" + frequency);
     }
 
-    class UnacceptableSymbolFound extends Throwable {
+    public class UnacceptableSymbolFound extends Throwable {
         public UnacceptableSymbolFound() {
             super(Thread.currentThread().getName() + " stopped it's work, due to the occurrence of a latin symbol in one of the threads ");
         }
+
+        public UnacceptableSymbolFound(String filename) {
+            super(Thread.currentThread().getName() + " stopped it's work, due to the occurrence of a latin symbol: " + filename);
+        }
+    }
+
+    static public void printTotalWords() {
+        int counter = 0;
+        for (Map.Entry<String, WordFrequency> entry : wordFrequencies.entrySet()) {
+            counter += entry.getValue().getFrequency();
+        }
+        System.out.println("Total words processed " + counter);
     }
 }

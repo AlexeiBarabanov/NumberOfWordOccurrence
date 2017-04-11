@@ -18,14 +18,12 @@ public class DocumentThread implements Runnable {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        DocumentParser parser = new DocumentParser(text);
+        DocumentParser parser = new DocumentParser(text, filename);
         try {
             parser.start();
             System.out.println(parser + System.lineSeparator());
         } catch (DocumentParser.UnacceptableSymbolFound e) {
             e.printStackTrace();
-        } finally {
         }
-
     }
 }

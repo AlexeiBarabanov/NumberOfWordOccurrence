@@ -16,6 +16,14 @@ public class WordFrequency {
         this.frequency++;
     }
 
+    public String getWord() {
+        return word;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
     @Override
     public String toString() {
         return " [" + frequency + ":" + word + "] ";
