@@ -30,6 +30,6 @@ public class Main {
             }
         }
 
-        DocumentParser.printTotalWords();
+        DocumentParser.totalNumberOfWords();
     }
 }

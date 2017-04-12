@@ -23,6 +23,19 @@ public class DocumentParser {
         this.filename = filename;
     }
 
+    public DocumentParser(String text) {
+        this.text = text;
+        this.filename = "";
+    }
+
+    public static void resetFlag() {
+        unacceptableSymbolFound = false;
+    }
+
+    public static void flushCollection() {
+        wordFrequencies.clear();
+    }
+
     static public void printWordOccurences() {
         wordFrequencies.forEach((k, v) -> System.out.println(v + ":" + k));
     }
@@ -39,7 +52,7 @@ public class DocumentParser {
         int newWordsCount = 0;
         int distinctWordsCount = 0;
 
-        String check = this.text.replaceAll("[A-Za-z]", " ");
+        String check = this.text.replaceAll("[A-Za-z]", "");
 //        if (!Pattern.matches("[0-9а-яА-ЯёЁ :;!?.,\"'()//\\r\\n]+", text)) {
         if(check.length() != this.text.length()) {
             this.unacceptableSymbolFound = true;
@@ -102,11 +115,11 @@ public class DocumentParser {
         }
     }
 
-    static public void printTotalWords() {
+    static public int totalNumberOfWords() {
         int counter = 0;
         for (Map.Entry<String, WordFrequency> entry : wordFrequencies.entrySet()) {
             counter += entry.getValue().getFrequency();
         }
-        System.out.println("Total words processed " + counter);
+        return counter;
     }
 }
